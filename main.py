@@ -16,12 +16,6 @@ REPO_OWNER = os.getenv("REPO_OWNER")
 REPO_NAME = os.getenv("REPO_NAME")
 DATA_FILE_PATH = os.getenv("DATA_FILE_PATH")  # Path to CSV file in the repository
 
-# Print them for debugging (optional)
-print(f"GITHUB_TOKEN: {GITHUB_TOKEN}")
-print(f"REPO_OWNER: {REPO_OWNER}")
-print(f"REPO_NAME: {REPO_NAME}")
-print(f"DATA_FILE_PATH: {DATA_FILE_PATH}")
-
 # Local paths for saving model and predictions
 MODEL_FILEPATH = 'data/bayesian_model.pkl'
 OUTPUT_FILEPATH = 'data/predicted_numbers.csv'
