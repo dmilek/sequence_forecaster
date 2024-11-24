@@ -4,6 +4,11 @@ on:
   workflow_dispatch: # Allows for manual workflow trigger
   schedule:
     - cron: '0 3 * * *'  # Runs every day at 03:00 UTC
+env:  # Global environment variables for the workflow
+  FINE_GRAINED_PAT: ${{ secrets.FINE_GRAINED_PAT }}  #  Securely access PAT from GitHub secrets
+  REPO_OWNER: ${{ secrets.REPO_OWNER }}  # Repository owner from secrets
+  REPO_NAME: ${{ secrets.REPO_NAME }}  # Repository name from secrets
+  DATA_FILE_PATH: ${{ secrets.DATA_FILE_PATH }}  # Path to CSV file in the repository
 
 jobs:
   run-python-project:
@@ -28,11 +33,6 @@ jobs:
 
       # Step 4: Run the Python script
       - name: Run Python Script
-        env:
-          GITHUB_TOKEN: ${{ secrets.FINE_GRAINED_PAT }} # Securely access PAT from GitHub secrets
-          REPO_OWNER: ${{ secrets.REPO_OWNER }}
-          REPO_NAME: ${{ secrets.REPO_NAME }}
-          DATA_FILE_PATH: ${{ secrets.DATA_FILE_PATH }}
         run: |
           python main.py
 
