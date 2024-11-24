@@ -66,6 +66,9 @@ def main():
         html_report = HTMLGenerator.generate_html(predictions)
         logger.info(f"HTML report generated {html_report}")
 
+        # Print the HTML to standard output so GitHub Actions can capture it
+        print(html_report)  # This is what GitHub Actions will read
+
     except Exception as e:
         # Log any errors during the process
         logger.error(f"An error occurred: {e}")
