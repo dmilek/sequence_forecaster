@@ -35,8 +35,10 @@ jobs:
       - name: Generate HTML Report
         id: generate_html_report
         run: |
-          html_report=$(python main.py | grep "<html")
-          echo "html_report=$html_report" >> $GITHUB_ENV
+          html_report=$(python main.py)
+          echo "html_report<<EOF" >> $GITHUB_ENV
+          echo "$html_report" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           
       # Step 5: Set Git user for commit
       - name: Set Git user
