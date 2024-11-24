@@ -3,7 +3,7 @@ name: Daily Sequence Forecaster
 on:
   workflow_dispatch: # Allows for manual workflow trigger
   schedule:
-    - cron: '0 2 * * *'  # Runs every day at 02:00 UTC
+    - cron: '0 3 * * *'  # Runs every day at 03:00 UTC
 
 jobs:
   run-python-project:
