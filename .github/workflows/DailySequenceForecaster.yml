@@ -1,4 +1,4 @@
-name: Daily Sequence Forecaster
+name: Daily sequence forecaster
 
 on:
   workflow_dispatch: # Allows for manual workflow trigger
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10" # Specify your Python version
+          python-version: "3.13" # Specify your Python version
 
       # Step 3: Install dependencies
       - name: Install Dependencies
@@ -33,17 +33,24 @@ jobs:
         run: |
           python main.py
 
-      # Step 5: Set Git user for commit
-      - name: Set Git user
+      # Step 5: Commit the generated HTML file
+      - name: Commit generated HTML
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-
-      # Step 6: Commit and Push Updates
-      - name: Commit and Push Predicted Numbers
-        env:
-          GITHUB_TOKEN: ${{ secrets.FINE_GRAINED_PAT }}
-        run: |
-          git add data/predicted_numbers.csv
-          git commit -m "Update predicted numbers [skip ci]" || echo "No changes to commit"
+          git add data/predictions.html
+          git commit -m "Add predictions HTML report"
           git push
+
+      # Step 6: Send the report via email
+      - name: Send Email with HTML Report
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: 'Daily Sequence Forecaster - Predicted Numbers'
+          from: 'Notification Service <notification.service1988@gmail.com>'  # Your sender email address
+          html_body: ${{ env.html_report }}  # Use the HTML report generated in step 4
+          to: ${{ secrets.EMAIL_RECIPIENT }} # Replace with recipient's email
