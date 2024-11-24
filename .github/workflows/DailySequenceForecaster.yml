@@ -36,13 +36,13 @@ jobs:
         run: |
           python main.py
 
-      # Step 5: Commit the generated HTML file
-      - name: Commit generated HTML
+      # Step 5: Commit the generated csv file
+      - name: Commit generated csv
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add data/predictions.html
-          git commit -m "Add predictions HTML report"
+          git add data/predicted_numbers.csv
+          git commit -m "Add predictions csv file"
           git push
 
       # Step 6: Send the report via email
