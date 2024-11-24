@@ -30,6 +30,9 @@ jobs:
       - name: Run Python Script
         env:
           GITHUB_TOKEN: ${{ secrets.FINE_GRAINED_PAT }} # Securely access PAT from GitHub secrets
+          REPO_OWNER: ${{ secrets.REPO_OWNER }}
+          REPO_NAME: ${{ secrets.REPO_NAME }}
+          DATA_FILE_PATH: ${{ secrets.DATA_FILE_PATH }}
         run: |
           python main.py
 
