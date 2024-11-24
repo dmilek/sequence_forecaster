@@ -1,14 +1,15 @@
 from dotenv import load_dotenv
-
 from models.bayesian_model import BayesianModel
 from utils.utility_functions import save_predictions
 from utils.github_handler import PrivateGitHubCSV
 from utils.logger import Logger
+from utils.html_report_generator import HTMLGenerator  # Import the HTML generator class
 import os
 
 # Initialize logger
 logger = Logger.get_logger()
 load_dotenv()
+
 # GitHub and file paths configuration
 GITHUB_TOKEN = os.getenv("FINE_GRAINED_PAT")  # Token stored in environment variables
 REPO_OWNER = os.getenv("REPO_OWNER")
@@ -26,7 +27,7 @@ def main():
     - Train the Bayesian model with the fetched data.
     - Save the trained model state.
     - Predict the next sequence of numbers.
-    - Save the predictions locally.
+    - Save the predictions locally and generate an HTML report.
     """
     try:
         # Step 1: Fetch the CSV file from GitHub
@@ -59,6 +60,11 @@ def main():
         logger.info("Saving predictions to file...")
         save_predictions(predictions, OUTPUT_FILEPATH)
         logger.info(f"Predicted numbers saved to {OUTPUT_FILEPATH}")
+
+        # Step 8: Generate HTML report for the predictions
+        logger.info("Generating HTML report...")
+        html_report = HTMLGenerator.generate_html(predictions)
+        logger.info(f"HTML report generated {html_report}")
 
     except Exception as e:
         # Log any errors during the process
