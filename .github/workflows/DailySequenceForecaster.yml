@@ -35,17 +35,23 @@ jobs:
       - name: Run Python Script
         run: |
           python main.py
-
-      # Step 5: Commit the generated csv file
-      - name: Commit generated csv
+          
+      # Step 5: Set Git user for commit
+      - name: Set Git user
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+          
+      # Step 6: Commit the generated csv file
+      - name: Commit generated csv
+        run: |
           git add data/predicted_numbers.csv
-          git commit -m "Add predictions csv file"
+          git commit -m "Update predicted numbers [skip ci]" || echo "No changes to commit"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 6: Send the report via email
+      # Step 7: Send the report via email
       - name: Send Email with HTML Report
         uses: dawidd6/action-send-mail@v3
         with:
