@@ -123,4 +123,4 @@ The workflow is scheduled to run daily at 3:00 AM UTC or can be manually trigger
 - Optimize model storage to reduce repository size.
 
 # License
-This project is licensed under the MIT License.
+![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
