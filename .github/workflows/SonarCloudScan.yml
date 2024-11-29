@@ -23,20 +23,30 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # Specify the Python version
+          python-version: '3.13'  # Specify the Python version
 
-      # Step 3: Install dependencies
+      # Step 3: Cache Python dependencies
+      # Cache pip dependencies to speed up subsequent runs
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # Step 4: Install dependencies
       # Install Python dependencies required by the project
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4: Install curl and unzip for SonarScanner CLI
+      # Step 5: Install curl and unzip for SonarScanner CLI
       - name: Install curl and unzip
         run: sudo apt-get install -y curl unzip
 
-      # Step 5: Download and install SonarScanner CLI
+      # Step 6: Download and install SonarScanner CLI
       - name: Install SonarScanner
         run: |
           curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
@@ -44,11 +54,11 @@ jobs:
           mv sonar-scanner-5.0.1.3006-linux sonar-scanner
           echo "$(pwd)/sonar-scanner/bin" >> $GITHUB_PATH
 
-      # Step 6: Verify SonarScanner Installation
+      # Step 7: Verify SonarScanner Installation
       - name: Verify SonarScanner Installation
         run: sonar-scanner --version
 
-      # Step 7: Run SonarCloud Analysis
+      # Step 8: Run SonarCloud Analysis
       # This step runs the analysis using SonarCloud
       - name: Run SonarCloud Analysis
         env:
@@ -60,4 +70,6 @@ jobs:
             -Dsonar.projectKey=$SONAR_PROJECT_KEY \
             -Dsonar.organization=$SONAR_ORG_KEY \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.python.coverage.reportPaths=coverage.xml \
+            -Dsonar.python.pylint.reportPaths=pylint-report.json
