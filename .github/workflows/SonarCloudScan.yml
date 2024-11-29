@@ -1,44 +1,59 @@
 name: SonarCloud Analysis
 
 on:
-  workflow_dispatch: # Allows for manual trigger
-  # Trigger analysis on push to the main branch or a pull request to main
+  workflow_dispatch: # Allows for manual trigger of the workflow
   push:
     branches:
-      - main
+      - main  # Run the workflow on pushes to the 'main' branch
   pull_request:
     branches:
-      - main
+      - main  # Run the workflow on pull requests to the 'main' branch
 
-env:  # Global environment variables for the workflow
-  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Use the SonarCloud token from GitHub secrets
-  SONAR_ORG_KEY: ${{ secrets.SONAR_ORG_KEY }}  # Use the SonarCloud organization key from GitHub secrets
-  SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}  # Use the SonarCloud project key from GitHub secrets
-  
 jobs:
   sonarcloud:
-    # Use the latest Ubuntu runner
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
     steps:
-      # Step 1: Checkout the code from the repository
+      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
       # Step 2: Set up Java 11 environment
-      # This step installs Java 11 on the GitHub runner environment
+      # This step installs and configures Java 11
       - name: Set up Java 11
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
-          distribution: 'adopt'  # or 'zulu', 'adoptium', 'oracle', etc.
-          java-package: jdk
+          java-version: '11'  # Specify Java 11
+          distribution: 'adopt'  # Use AdoptOpenJDK (now Eclipse Temurin)
 
-      # Step 3: Run the SonarCloud analysis
-      # This step uses the official SonarCloud GitHub Action to run the analysis
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v2.0.0
-
-      # Optional Step: Print the Java version (for debugging purposes)
+      # Step 3: (Optional) Verify Java version
+      # This step ensures the correct Java version is installed for debugging
       - name: Verify Java Version
-        run: java -version  # This will print the Java version being used in the environment for confirmation
+        run: java -version
+
+      # Step 4: Create sonar-project.properties file
+      # This file defines mandatory properties for SonarCloud analysis
+      - name: Create sonar-project.properties file
+        run: |
+          echo "sonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}" > sonar-project.properties
+          echo "sonar.organization=${{ secrets.SONAR_ORG_KEY }}" >> sonar-project.properties
+          echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
+
+      # Step 5: Run the SonarCloud analysis using SonarScanner
+      # Environment variables are defined locally for this step
+      - name: Run SonarCloud Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORG_KEY: ${{ secrets.SONAR_ORG_KEY }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.organization=$SONAR_ORG_KEY \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN
+
+      # Step 6: (Optional) Debugging: Display the SonarScanner configuration
+      # This step is useful for debugging the SonarScanner setup
+      - name: Display sonar-project.properties
+        run: cat sonar-project.properties
