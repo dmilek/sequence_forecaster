@@ -1,67 +1,55 @@
-name: SonarCloud Scan - Python
+name: SonarCloud Analysis
 
 on:
+  # Trigger the workflow on push or pull requests to the 'main' branch
   push:
     branches:
       - main
   pull_request:
-  schedule:
-    - cron: '0 3 * * 1'  # Every Monday
+    branches:
+      - main
 
 jobs:
   sonarcloud:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout the code from the repository
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # This action checks out your code to the runner
 
-      # Step 2: Set up Python environment
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      # Step 2: Set up Java 11
+      - name: Set up Java 11
+        uses: actions/setup-java@v3  # Uses the setup-java action to install Java
         with:
-          python-version: '3.13'
-
-      # Step 3: Install project dependencies
-      - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
-
-      # Step 4: Set up Java 17 for SonarScanner
-      - name: Set up Java 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'adopt'  # or 'zulu', 'adoptium', 'oracle', etc.
           java-package: jdk
 
-      # Step 5: Ensure that JAVA_HOME points to Java 17
-      - name: Set JAVA_HOME to Java 17
+      # Step 3: Set up SonarScanner 4.7 (since it's compatible with Java 11)
+      - name: Set up SonarScanner 4.7
         run: |
-          echo "JAVA_HOME=/opt/hostedtoolcache/Java_Adopt_jdk/17.0.13-11/x64" >> $GITHUB_ENV
-          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
-
-      # Step 6: Install SonarScanner
-      - name: Install SonarScanner
-        run: |
-          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+          # Download and extract SonarScanner 4.7 version
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
           unzip sonar-scanner.zip
-          mv sonar-scanner-*/ sonar-scanner
+          mv sonar-scanner-*/ sonar-scanner  # Move the extracted files into the working directory
+          
+          # Set SONAR_SCANNER_HOME environment variable for SonarScanner location
           echo "SONAR_SCANNER_HOME=$(pwd)/sonar-scanner" >> $GITHUB_ENV
+          
+          # Add SonarScanner bin directory to the PATH so it can be run easily
           echo "$(pwd)/sonar-scanner/bin" >> $GITHUB_PATH
 
-      # Step 7: Run SonarCloud Scan with Java 17 explicitly
+      # Step 4: Run the SonarCloud Scan with the appropriate environment
       - name: Run SonarCloud Scan
         run: |
-          # Ensure JAVA_HOME points to Java 17 before running sonar-scanner
-          export JAVA_HOME=$JAVA_HOME
-          export PATH=$JAVA_HOME/bin:$PATH
-          
-          # Disable SonarScanner’s bundled JVM and force Java 17
+          # Ensure JAVA_HOME points to the correct Java 11 directory before running sonar-scanner
+          export JAVA_HOME=/opt/hostedtoolcache/Java_Adopt_jdk/11.0.13-9/x64
+          export PATH=$JAVA_HOME/bin:$PATH  # Add Java 11's bin directory to PATH
+
+          # Run the SonarScanner with the necessary parameters
           sonar-scanner \
-            -Dsonar.projectKey=sequence_forecaster \
-            -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.java.jdkHome=$JAVA_HOME
+            -Dsonar.projectKey=sequence_forecaster \  # The unique key for your SonarCloud project
+            -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \  # Organization key (stored as a secret)
+            -Dsonar.host.url=https://sonarcloud.io \  # URL for SonarCloud
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}  # SonarCloud authentication token (stored as a secret)
