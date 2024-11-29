@@ -1,0 +1,44 @@
+name: SonarCloud Scan - Python
+
+on:
+  # Trigger scan on every push to the main branch and pull requests
+  push:
+    branches:
+      - main
+  pull_request:
+  # Schedule a periodic scan every Monday at 3 AM UTC
+  schedule:
+    - cron: '0 3 * * 1'  # Every Monday
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        # Fetches the repository code for analysis.
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'  # Replace with your Python version
+        # Sets up the Python environment for the project.
+
+      # Step 3: Install project dependencies
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+        # Installs the required Python dependencies.
+
+      # Step 4: Run SonarCloud analysis
+      - name: Run SonarCloud Scan
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=sequence_forecaster \
+            -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        # Analyzes the Python project with SonarCloud and uploads the results.
