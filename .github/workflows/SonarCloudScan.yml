@@ -32,10 +32,10 @@ jobs:
       # This step uses the official SonarCloud GitHub Action to run the analysis
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.0.0
-        with:
-          organization: ${{ secrets.SONAR_ORG_KEY }}  # Use the organization key stored in GitHub Secrets
-          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}  # Use the project key stored in GitHub Secrets
-          token: ${{ secrets.SONAR_TOKEN }}  # Use the SonarCloud authentication token stored in GitHub Secrets
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Use the SonarCloud token from GitHub secrets
+          SONAR_ORG_KEY: ${{ secrets.SONAR_ORG_KEY }}  # Use the SonarCloud organization key from GitHub secrets
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}  # Use the SonarCloud project key from GitHub secrets
 
       # Optional Step: Print the Java version (for debugging purposes)
       - name: Verify Java Version
