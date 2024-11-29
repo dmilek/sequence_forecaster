@@ -1,56 +1,42 @@
 name: SonarCloud Analysis
 
 on:
+  # Trigger analysis on push to the main branch or a pull request to main
   push:
     branches:
-      - main  # Run on push to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Run on pull requests to the main branch
+      - main
 
 jobs:
   sonarcloud:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner for GitHub Actions
+    # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository code
-      - name: Checkout Code
-        uses: actions/checkout@v3  # This action checks out your repository
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Step 2: Set up Java 11
+      # Step 2: Set up Java 11 environment
+      # This step installs Java 11 on the GitHub runner environment
       - name: Set up Java 11
-        uses: actions/setup-java@v3  # Action to set up a specific version of Java
+        uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'adopt'  # or 'zulu', 'adoptium', 'oracle', etc.
           java-package: jdk
 
-      # Step 3: Install SonarScanner (version 4.7 for compatibility with Java 11)
-      - name: Install SonarScanner 4.7
-        run: |
-          # Download and install SonarScanner 4.7
-          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
-          unzip sonar-scanner.zip
-          mv sonar-scanner-*/ sonar-scanner
-          # Set SONAR_SCANNER_HOME environment variable
-          echo "SONAR_SCANNER_HOME=$(pwd)/sonar-scanner" >> $GITHUB_ENV
-          # Add SonarScanner's bin directory to the PATH
-          echo "$(pwd)/sonar-scanner/bin" >> $GITHUB_PATH
+      # Step 3: Run the SonarCloud analysis
+      # This step uses the official SonarCloud GitHub Action to run the analysis
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v2.0.0
+        with:
+          organization: ${{ secrets.SONAR_ORG_KEY }}  # Use the organization key stored in GitHub Secrets
+          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}  # Use the project key stored in GitHub Secrets
+          token: ${{ secrets.SONAR_TOKEN }}  # Use the SonarCloud authentication token stored in GitHub Secrets
 
-      # Step 4: Check Java Version (for debugging)
-      - name: Check Java version
-        run: java -version  # Ensure Java 11 is being used
-
-      # Step 5: Run the SonarCloud scan
-      - name: Run SonarCloud Scan
-        run: |
-          # Ensure JAVA_HOME points to the correct Java 11 directory
-          export JAVA_HOME=/opt/hostedtoolcache/Java_Adopt_jdk/11.0.25-9/x64
-          export PATH=$JAVA_HOME/bin:$PATH  # Add Java 11 bin directory to PATH
-
-          # Run SonarScanner with the necessary parameters
-          sonar-scanner \
-            -Dsonar.projectKey=sequence_forecaster \  # Replace with your project key
-            -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \  # Use organization key from GitHub secrets
-            -Dsonar.host.url=https://sonarcloud.io \  # SonarCloud URL
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}  # Use SonarCloud token from GitHub secrets
+      # Optional Step: Print the Java version (for debugging purposes)
+      - name: Verify Java Version
+        run: java -version  # This will print the Java version being used in the environment for confirmation
