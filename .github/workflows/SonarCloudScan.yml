@@ -35,7 +35,7 @@ jobs:
           java-version: '17'
           distribution: 'adopt'  # or 'zulu', 'adoptium', 'oracle', etc.
           java-package: jdk
-          
+
       # Step 5: Ensure that JAVA_HOME points to Java 17
       - name: Set JAVA_HOME to Java 17
         run: |
@@ -51,16 +51,17 @@ jobs:
           echo "SONAR_SCANNER_HOME=$(pwd)/sonar-scanner" >> $GITHUB_ENV
           echo "$(pwd)/sonar-scanner/bin" >> $GITHUB_PATH
 
-      # Step 7: Run SonarCloud Scan using Java 17 explicitly
+      # Step 7: Run SonarCloud Scan with Java 17 explicitly
       - name: Run SonarCloud Scan
         run: |
-          # Make sure JAVA_HOME is correctly set before running sonar-scanner
+          # Ensure JAVA_HOME points to Java 17 before running sonar-scanner
           export JAVA_HOME=$JAVA_HOME
           export PATH=$JAVA_HOME/bin:$PATH
           
-          # Now run the SonarScanner with Java 17
+          # Disable SonarScanner’s bundled JVM and force Java 17
           sonar-scanner \
             -Dsonar.projectKey=sequence_forecaster \
             -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.java.jdkHome=$JAVA_HOME
