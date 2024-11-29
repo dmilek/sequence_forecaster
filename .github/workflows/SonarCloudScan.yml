@@ -18,22 +18,25 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v3
-        # Fetches the repository code for analysis.
 
       # Step 2: Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.13'
-        # Sets up the Python environment for the project.
 
       # Step 3: Install project dependencies
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
-        # Installs the required Python dependencies.
 
-      # Step 4: Install SonarScanner CLI
+      # Step 4: Set up Java 17 for SonarScanner
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      # Step 5: Install SonarScanner CLI
       - name: Install SonarScanner
         run: |
           curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
@@ -41,9 +44,8 @@ jobs:
           mv sonar-scanner-*/ sonar-scanner
           echo "SONAR_SCANNER_HOME=$(pwd)/sonar-scanner" >> $GITHUB_ENV
           echo "$(pwd)/sonar-scanner/bin" >> $GITHUB_PATH
-        # Downloads and installs the SonarScanner CLI.
 
-      # Step 5: Run SonarCloud analysis
+      # Step 6: Run SonarCloud analysis
       - name: Run SonarCloud Scan
         run: |
           sonar-scanner \
@@ -51,4 +53,3 @@ jobs:
             -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-        # Runs the SonarCloud scan using the installed SonarScanner CLI.
