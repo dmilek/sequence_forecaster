@@ -21,7 +21,7 @@ jobs:
       - name: Set up Java 11
         uses: actions/setup-java@v3  # Action to set up a specific version of Java
         with:
-          java-version: '23'
+          java-version: '11'
           distribution: 'adopt'  # or 'zulu', 'adoptium', 'oracle', etc.
           java-package: jdk
 
