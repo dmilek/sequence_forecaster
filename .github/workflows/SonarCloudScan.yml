@@ -1,6 +1,7 @@
 name: SonarCloud Analysis
 
 on:
+  workflow_dispatch: # Allows for manual trigger
   # Trigger analysis on push to the main branch or a pull request to main
   push:
     branches:
