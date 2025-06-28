@@ -1,6 +1,22 @@
 name: CI_test_workflow_call
 on:
   workflow_call:
+    secrets:
+      FINE_GRAINED_PAT:
+        required: true
+      REPO_OWNER:
+        required: true
+      REPO_NAME:
+        required: true
+      DATA_FILE_PATH:
+        required: true
+      EMAIL_USERNAME:
+        required: true
+      EMAIL_PASSWORD:
+        required: true
+      EMAIL_RECIPIENT:
+        required: true
+
 env:  # Global environment variables for the workflow
   FINE_GRAINED_PAT: ${{ secrets.FINE_GRAINED_PAT }}  #  Securely access PAT from GitHub secrets
   REPO_OWNER: ${{ secrets.REPO_OWNER }}  # Repository owner from secrets
