@@ -1,5 +1,4 @@
-name: Daily sequence forecaster
-
+name: CI_test_workflow_call
 on:
   workflow_call:
 env:  # Global environment variables for the workflow
@@ -19,6 +18,7 @@ jobs:
         with:
            repository: dmilek/sequence_forecaster
            ref: main
+           token: ${{ secrets.GITHUB_TOKEN }}
            
       # Step 2: Set up Python environment
       - name: Set up Python
