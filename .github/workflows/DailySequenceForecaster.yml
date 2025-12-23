@@ -2,8 +2,8 @@ name: Daily sequence forecaster
 
 on:
   workflow_dispatch: # Allows for manual workflow trigger
-  schedule:
-    - cron: '0 3 * * *'  # Runs every day at 03:00 UTC
+  # schedule:
+  #   - cron: '0 3 * * *'  # Runs every day at 03:00 UTC
 env:  # Global environment variables for the workflow
   FINE_GRAINED_PAT: ${{ secrets.FINE_GRAINED_PAT }}  #  Securely access PAT from GitHub secrets
   REPO_OWNER: ${{ secrets.REPO_OWNER }}  # Repository owner from secrets
